@@ -681,7 +681,6 @@ void KiemTraMatKhau() {
         bip();
         bip();
         delay_ms(1000);
-        LCD_Clear();
         goto saipass;
       }
     }
@@ -1173,14 +1172,14 @@ void BatTatDTMF() {
     if (mp == 14 || mp == 12) //phim #, tat thiet bi
     {
       if (tb1 == 1) {
-        tb1 = 0;
+        //tb1 = 0;
         TB1 = 1;
         bip();
         delay_ms(100);
         bip();
       }
       if (tb2 == 1) {
-        tb2 = 0;
+        //tb2 = 0;
         TB2 = 1;
         bip();
         delay_ms(100);
