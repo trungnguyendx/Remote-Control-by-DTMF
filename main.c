@@ -640,7 +640,7 @@ void KiemTraMatKhau() {
     TR1 = 0; //tat Timer
     saipass: ;
     LCD_Clear();
-    LCD_Gotoxy(0, 0);
+    LCD_Gotoxy(1, 0);
     LCD_Puts("Nhap mat khau");
     LCD_Gotoxy(0, 1);
     NhapMatKhau();
@@ -1081,17 +1081,6 @@ void DieuKhienThietBi() {
         if (mode == 2) {
           LCD_Clear();
         }
-        /*if (mode == 3) {
-          bip();
-          bip();
-          bip();
-          //Bat Timer
-          MODE = 0;
-          TR1 = 1;
-          LCD_Clear();
-          break;
-        }*/
-
       }
     }
 
@@ -1316,12 +1305,15 @@ void main() {
   delay_ms(100);
   LCD_Clear();
   bip();
-  LCD_Gotoxy(3, 0);
-  LCD_Puts("Smart Home");
+  LCD_Gotoxy(1,0);
+  LCD_Puts("DTMF Controller");
+  LCD_Gotoxy(6,1);
+  LCD_Puts("V1.0");
   delay_ms(1500);
   LCD_Clear();
   while (1) {
     DocMatKhau();
+	HienThoiGian();
     KiemTraMatKhau();
     DieuKhienThietBi();
     HenGioTB1();
@@ -1330,7 +1322,6 @@ void main() {
     CaiMatKhau();
     KiemTraTrangThaiThietBi();
     KiemTraThoiGianTuDong();
-    HienThoiGian();
     DieuKhienDTMF();
   }
 }
@@ -1400,3 +1391,5 @@ void NgatNgoai1(void) interrupt 2 {
   TimeOut = 0;
   TR0 = 1; //bat timer0 TimeOut                                                                      
 }
+
+
