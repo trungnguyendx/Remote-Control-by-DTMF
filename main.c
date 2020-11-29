@@ -13,7 +13,6 @@
 
 //Khai bao chan giao tiep LCD16x2 4bit
 #define LCD_RS P3_7
-
 #define LCD_EN P3_6
 
 #define LCD_D4 P3_5
@@ -36,10 +35,13 @@
 //Khai bao hang so
 
 //Khai bao bien toan cuc
+
 char gio, phut, giay, ngay, thang, nam, thu; //phuc vu hien thi thoi gian
 char gioontb1, phutontb1, gioontb2, phutontb2; //phuc vu tu dong bat tat thiet bi
 char gioofftb1, phutofftb1, gioofftb2, phutofftb2;
 
+char Character1[8]= {14, 17, 17, 17, 31, 31, 31, 0 };	//Icon khoa
+char Character2[8]= {14, 17, 1, 1, 31, 31, 31, 0 };  //Icon mo khoa
 bit lock = 1;
 KtLock = 0; // trang thai khoa
 bit trangthaicaidatontb1 = 0, trangthaicaidatontb2 = 0; //trang thai tu dong bat tat 
@@ -322,7 +324,7 @@ void LCD_Send4Bit(unsigned char Data) {
   LCD_D7 = (Data >> 3) & 1;
 }
 
-void LCD_SendCommand(unsigned char command) {
+void LCD_SendCommand(unsigned char command) {	
   LCD_Send4Bit(command >> 4); /* Gui 4 bit cao */
   LCD_Enable();
   LCD_Send4Bit(command); /* Gui 4 bit thap*/
@@ -331,24 +333,6 @@ void LCD_SendCommand(unsigned char command) {
 void LCD_Clear() {
   LCD_SendCommand(0x01);
   delay_us(10);
-}
-
-void LCD_Init() {
-  LCD_Send4Bit(0x00);
-  delay_ms(20);
-  LCD_RS = 0;
-  LCD_Send4Bit(0x03);
-  LCD_Enable();
-  delay_ms(5);
-  LCD_Enable();
-  delay_us(100);
-  LCD_Enable();
-  LCD_Send4Bit(0x02);
-  LCD_Enable();
-  LCD_SendCommand(0x28);
-  LCD_SendCommand(0x0c);
-  LCD_SendCommand(0x06);
-  LCD_SendCommand(0x01);
 }
 
 void LCD_Gotoxy(unsigned char col, unsigned char row) {
@@ -373,6 +357,37 @@ void LCD_Puts(char * s) {
   }
 }
 
+void LCDBuildChar(unsigned char loc, unsigned char *p) {
+     unsigned char i;
+     if(loc<8)                                 //If valid address
+	 {
+         LCD_SendCommand(0x40+(loc*8));               //Write to CGRAM
+         for(i=0;i<8;i++)
+            LCD_PutChar(p[i]);                   //Write the character pattern to CGRAM
+     }
+	 LCD_SendCommand(0x80);                           //shift back to DDRAM location 0
+}
+
+void LCD_Init() {
+  LCD_Send4Bit(0x00);
+  delay_ms(20);
+  LCD_RS = 0;
+  LCD_Send4Bit(0x03);
+  LCD_Enable();
+  delay_ms(5);
+  LCD_Enable();
+  delay_us(100);
+  LCD_Enable();
+  LCD_Send4Bit(0x02);
+  LCD_Enable();
+  LCD_SendCommand(0x28);
+  LCD_SendCommand(0x0c);
+  LCD_SendCommand(0x06);
+  LCDBuildChar(0, Character1); 
+  LCDBuildChar(1, Character2); 
+  LCD_SendCommand(0x01);
+}
+
 //Hien thi thoi gian thuc
 void HienThoiGian() {
   laythoigiantrongds();
@@ -383,6 +398,8 @@ void HienThoiGian() {
 
   LCD_PutChar(phut / 10 + 0x30);
   LCD_PutChar(phut % 10 + 0x30);
+  LCD_PutChar(32);
+  if(lock) LCD_PutChar(0); else LCD_PutChar(1);
   //LCD_Puts(":");
 
   //LCD_PutChar(giay/10+0x30);
@@ -1278,7 +1295,7 @@ void main() {
   trangthaicaidatofftb2 = DSl3O7_Read(0x2b);
 
   //Set up Mat khau
-  if (!DSl3O7_Read(0x30) && !DSl3O7_Read(0x31) && !DSl3O7_Read(0x32) && !DSl3O7_Read(0x33)) {
+  if (DSl3O7_Read(0x30)==0 && DSl3O7_Read(0x31)==0 && DSl3O7_Read(0x32)==0 && DSl3O7_Read(0x33)==0) {
     DSl3O7_Write(0x30, 1);
     DSl3O7_Write(0x31, 6);
     DSl3O7_Write(0x32, 0);
@@ -1308,7 +1325,7 @@ void main() {
   LCD_Gotoxy(1,0);
   LCD_Puts("DTMF Controller");
   LCD_Gotoxy(6,1);
-  LCD_Puts("V1.0");
+  LCD_Puts("V1.0 ");
   delay_ms(1500);
   LCD_Clear();
   while (1) {
@@ -1323,7 +1340,7 @@ void main() {
     KiemTraTrangThaiThietBi();
     KiemTraThoiGianTuDong();
     DieuKhienDTMF();
-  }
+  }	
 }
 
 void Timer1(void) interrupt TF1_VECTOR {
