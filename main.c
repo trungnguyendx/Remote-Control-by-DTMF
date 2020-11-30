@@ -1295,7 +1295,7 @@ void main() {
   trangthaicaidatofftb2 = DSl3O7_Read(0x2b);
 
   //Set up Mat khau
-  if (DSl3O7_Read(0x30)==0 && DSl3O7_Read(0x31)==0 && DSl3O7_Read(0x32)==0 && DSl3O7_Read(0x33)==0) {
+  if (DSl3O7_Read(0x00)==80) {
     DSl3O7_Write(0x30, 1);
     DSl3O7_Write(0x31, 6);
     DSl3O7_Write(0x32, 0);
